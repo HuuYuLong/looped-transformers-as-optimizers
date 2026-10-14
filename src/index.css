@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+@import 'katex/dist/katex.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 24% 12%;
+    --card: 220 22% 97%;
+    --card-foreground: 220 24% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 24% 12%;
+    --primary: 152 30% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 16% 95%;
+    --secondary-foreground: 220 24% 12%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 42%;
+    --accent: 26 60% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 60% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 14% 88%;
+    --input: 220 14% 88%;
+    --ring: 152 30% 38%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: rgba(163, 201, 168, 0.3);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+  }
+  .font-mono2 {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .text-blue-soft { color: #5f7fa8; }
+  .text-green-soft { color: #6da574; }
+  .text-orange-soft { color: #db8b4d; }
+  .text-red-soft { color: #c25a48; }
+  .bg-blue-soft { background-color: #5f7fa8; }
+  .bg-green-soft { background-color: #6da574; }
+  .bg-orange-soft { background-color: #db8b4d; }
+  .border-blue-soft { border-color: #5f7fa8; }
+  .border-green-soft { border-color: #6da574; }
+  .border-orange-soft { border-color: #db8b4d; }
+  .text-balance { text-wrap: balance; }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(140, 163, 192, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(140, 163, 192, 0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+}
+
+.katex {
+  font-size: 1.05em;
+}
+/* formula scroll regions: scrollable but no visible scrollbar */
+.eq-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.eq-scroll::-webkit-scrollbar {
+  display: none;
+}
+.katex-display {
+  margin: 0.75em 0;
+}
+
+
+/* ===== Apple-grade motion ===== */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* focus visibility for keyboard users */
+:focus-visible {
+  outline: 2px solid #5f7fa8;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* gentler scrollbar, dark-chrome native feel */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 163, 192, 0.25);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 163, 192, 0.45);
+  background-clip: content-box;
+  border: 2px solid transparent;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
