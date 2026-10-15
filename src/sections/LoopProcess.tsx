@@ -101,8 +101,8 @@ function flattenKatex(html: string, size: number, color: string): string {
   return `<span style="display:inline-block;white-space:nowrap;font-size:${size * 1.05}px;line-height:1;color:${color}">${out}</span>`
 }
 
-function SvgTex({ x, y, tex, size = 11, color, anchor = 'middle', w = 180, pk }: {
-  x: number, y: number, tex: string, size?: number, color: string, anchor?: 'middle' | 'start', w?: number, pk?: string
+function SvgTex({ x, y, tex, size = 11, color, anchor = 'middle', w = 180, pk, opacity = 1 }: {
+  x: number, y: number, tex: string, size?: number, color: string, anchor?: 'middle' | 'start', w?: number, pk?: string, opacity?: number
 }) {
   const raw = useMemo(
     () => katex.renderToString(tex, { displayMode: false, throwOnError: false, output: 'html' }),
@@ -126,6 +126,7 @@ function SvgTex({ x, y, tex, size = 11, color, anchor = 'middle', w = 180, pk }:
       y={y - lineH / 2}
       width={w}
       height={lineH}
+      opacity={opacity}
       style={{ overflow: 'visible', pointerEvents: 'none' }}
     >
       <div
@@ -255,6 +256,7 @@ export default function LoopProcess() {
   const codaDot = alongPath(CODA_PATH, inCoda ? easeIO(Math.min((ct - PRE_MS - R * LAP) / CODA_MS, 1)) : 0)
 
   const boxOp = (i: number) => (inPre || inCoda ? 0.3 : phase === i ? 1 : 0.28)
+  const yTex = inPre ? String.raw`\mathbf{Y}_0` : inCoda ? String.raw`\mathbf{Y}_R` : String.raw`\mathbf{Y}_{${loop - 1}}`
 
   return (
     <div
@@ -285,7 +287,6 @@ export default function LoopProcess() {
             <g transform={`translate(${HX} ${HY})`} opacity={boxOp(0)}>
               <rect x={-28} y={-12} width={56} height={24} rx={12} fill="#fff" fillOpacity="0.85" stroke={gFlash > 0.05 ? '#6da574' : '#76839a'} strokeOpacity={0.7 + gFlash * 0.3} strokeWidth={1.1 + gFlash * 0.7} style={{ transition: 'all 0.3s ease' }} />
               <rect x={-28} y={-12} width={56} height={24} rx={12} fill={gFlash > 0.05 ? '#6da574' : '#76839a'} fillOpacity={(phase === 0 || phase === 2 ? 0.18 : 0.08) + gFlash * 0.2} stroke="none" style={{ transition: 'all 0.3s ease' }} />
-              <SvgTex x={0} y={0} size={11} color={gFlash > 0.05 ? '#4e8a56' : '#5f6b7d'} tex={String.raw`\mathbf{H}^{\mathrm{in}}`} pk="hin" />
             </g>
           </g>
 
@@ -302,7 +303,6 @@ export default function LoopProcess() {
             <g transform={`translate(${OX} ${OY})`} opacity={boxOp(0)}>
               <rect x={-24} y={-11} width={48} height={22} rx={11} fill="#fff" fillOpacity="0.85" stroke="#5f7fa8" strokeOpacity={phase === 0 ? 0.95 : 0.35} strokeWidth={phase === 0 ? 1.6 : 1.1} style={{ transition: 'all 0.3s ease' }} />
               <rect x={-24} y={-11} width={48} height={22} rx={11} fill="#5f7fa8" fillOpacity={phase === 0 ? 0.22 : 0.1} stroke="none" style={{ transition: 'all 0.3s ease' }} />
-              <SvgTex x={0} y={0} size={11} color="#3f5c82" tex={String.raw`\boldsymbol{o}_l`} pk="ol" />
             </g>
           </g>
 
@@ -331,13 +331,11 @@ export default function LoopProcess() {
               />
               <text x={0} y={1} textAnchor="middle" fill="#b06f35" fontSize="13" fontFamily="JetBrains Mono">Recurrent Blocks</text>
               <text x={-8} y={15} textAnchor="end" fill="#db8b4d" fillOpacity="0.7" fontSize="8.5" fontFamily="JetBrains Mono">predict target</text>
-              <SvgTex x={-2} y={15} size={9} color="#db8b4d" anchor="start" w={40} tex={String.raw`\boldsymbol{t}_l`} pk="tl" />
             </g>
             {/* t_l — predicted target (right leg) */}
             <g transform={`translate(${TX2} ${TY2})`} opacity={boxOp(1)}>
               <rect x={-24} y={-11} width={48} height={22} rx={11} fill="#fff" fillOpacity="0.85" stroke="#db8b4d" strokeOpacity={phase === 1 ? 0.95 : 0.35} strokeWidth={phase === 1 ? 1.6 : 1.1} style={{ transition: 'all 0.3s ease' }} />
               <rect x={-24} y={-11} width={48} height={22} rx={11} fill="#db8b4d" fillOpacity={phase === 1 ? 0.22 : 0.1} stroke="none" style={{ transition: 'all 0.3s ease' }} />
-              <SvgTex x={0} y={0} size={11} color="#b06f35" tex={String.raw`\boldsymbol{t}_l`} pk="tl" />
             </g>
           </g>
 
@@ -379,7 +377,6 @@ export default function LoopProcess() {
           {(() => {
             const hue = '#6da574' // fast weight stays green at every step
             const absorb = !inPre && !inCoda && phase === 2 ? Math.sin(Math.min(Math.max((lp - 0.45) / 0.55, 0), 1) * Math.PI) : 0
-            const yTex = inPre ? String.raw`\mathbf{Y}_0` : inCoda ? String.raw`\mathbf{Y}_R` : String.raw`\mathbf{Y}_{${loop - 1}}`
             return (
               <g transform={`translate(${YX} ${YY})`} {...selectProps('y')}>
                 <rect
@@ -396,7 +393,6 @@ export default function LoopProcess() {
                   stroke="none"
                   style={{ transition: 'fill 0.25s ease' }}
                 />
-                <SvgTex x={0} y={1} size={13} color={hue} tex={yTex} pk={inPre ? 'Y0' : inCoda ? 'YR' : `Y${loop}`} />
                 <text x={0} y={YH2 / 2 + 16} textAnchor="middle" fill="#5f6b7d" fillOpacity="0.75" fontSize="9" fontFamily="JetBrains Mono">
                   fast weight
                 </text>
@@ -419,7 +415,6 @@ export default function LoopProcess() {
             <g transform={`translate(${PC_X} ${PR_Y})`}>
               <rect x={-74} y={-16} width={148} height={32} rx={16} fill="#fff" fillOpacity="0.88" stroke="#76839a" strokeOpacity={inPre ? 0.75 : 0.4} strokeWidth={inPre ? 1.5 : 1.1} style={{ transition: 'all 0.3s ease' }} />
               <rect x={-74} y={-16} width={148} height={32} rx={16} fill="#76839a" fillOpacity={inPre ? 0.16 + glow * 0.14 : 0.07} stroke="none" style={{ transition: 'all 0.3s ease' }} />
-              <SvgTex x={0} y={0} size={11} color="#5f6b7d" tex={String.raw`\text{Prelude } \mathbf{Y}_0`} pk="prelude" />
             </g>
             <text x={(PC_X + 74 + YX - YW2 / 2) / 2} y={PR_Y + 18} textAnchor="middle" fill="#5f6b7d" fillOpacity={inPre ? 0.9 : 0.45} fontSize="8.5" fontFamily="JetBrains Mono" style={{ transition: 'fill-opacity 0.3s ease' }}>
               initialize Y₀
@@ -436,7 +431,6 @@ export default function LoopProcess() {
             <g transform={`translate(${PC_X} ${CO_Y})`}>
               <rect x={-74} y={-16} width={148} height={32} rx={16} fill="#fff" fillOpacity="0.88" stroke="#76839a" strokeOpacity={inCoda ? 0.75 : 0.4} strokeWidth={inCoda ? 1.5 : 1.1} style={{ transition: 'all 0.3s ease' }} />
               <rect x={-74} y={-16} width={148} height={32} rx={16} fill="#76839a" fillOpacity={inCoda ? 0.16 + glow * 0.14 : 0.07} stroke="none" style={{ transition: 'all 0.3s ease' }} />
-              <SvgTex x={0} y={0} size={11} color="#5f6b7d" tex={String.raw`\text{Coda } \mathbf{Y}_R`} pk="coda" />
             </g>
             <g transform={`translate(${PC_X} ${LM_Y})`}>
               <rect x={-74} y={-16} width={148} height={32} rx={16} fill="#fff" fillOpacity="0.88" stroke="#76839a" strokeOpacity={inCoda ? 0.75 : 0.4} strokeWidth={inCoda ? 1.5 : 1.1} style={{ transition: 'all 0.3s ease' }} />
@@ -450,6 +444,14 @@ export default function LoopProcess() {
               at l = R
             </text>
           </g>
+
+          <SvgTex x={HX} y={HY} size={11} color={gFlash > 0.05 ? '#4e8a56' : '#5f6b7d'} tex={String.raw`\mathbf{H}^{\mathrm{in}}`} pk="hin" opacity={hl('hin') * boxOp(0)} />
+          <SvgTex x={OX} y={OY} size={11} color="#3f5c82" tex={String.raw`\boldsymbol{o}_l`} pk="ol" opacity={hl('o') * boxOp(0)} />
+          <SvgTex x={BXX - 2} y={BYY + 15} size={9} color="#db8b4d" anchor="start" w={40} tex={String.raw`\boldsymbol{t}_l`} pk="tl" opacity={hl('blocks')} />
+          <SvgTex x={TX2} y={TY2} size={11} color="#b06f35" tex={String.raw`\boldsymbol{t}_l`} pk="tl" opacity={hl('blocks') * boxOp(1)} />
+          <SvgTex x={YX} y={YY + 1} size={13} color="#6da574" tex={yTex} pk={inPre ? 'Y0' : inCoda ? 'YR' : `Y${loop}`} opacity={hl('y')} />
+          <SvgTex x={PC_X} y={PR_Y} size={11} color="#5f6b7d" tex={String.raw`\text{Prelude } \mathbf{Y}_0`} pk="prelude" opacity={hl('prelude')} />
+          <SvgTex x={PC_X} y={CO_Y} size={11} color="#5f6b7d" tex={String.raw`\text{Coda } \mathbf{Y}_R`} pk="coda" opacity={hl('coda')} />
 
           {/* ===== ONE flow dot per phase — drawn last, above the boxes ===== */}
           {!inPre && !inCoda && phase === 0 && (
